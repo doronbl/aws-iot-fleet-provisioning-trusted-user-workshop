@@ -1,26 +1,32 @@
-# AWS IoT Fleet Provisioning by trusted user
-This workshop demonstrate how to use AWS IoT Core Fleet Provisioning with trusted user to automate device provisioning workflow. 
+# AWS IoT device provisioning by trusted user
+This workshop demonstrate how to use AWS IoT Core device [provisioning by trusted user](https://docs.aws.amazon.com/iot/latest/developerguide/provision-wo-cert.html#trusted-user) to automate provisioning workflow. 
 
 To complete this workshop you will need an active AWS account.
 
-This workshop will use AWS EC2 Ubuntu instance to emulate a device. If you are using different operating system you will have to modify the operating system setup steps to your OS. Most of this workshop is independant of the device type.
+This workshop will use Ubuntu AWS EC2 instance to emulate a device. If you are using different operating system you will have to modify the operating system setup steps to your OS. Most of this workshop is independant of the device type.
 
 ## Setting up cloud resources
-This workshop assumes the usage of US East (N. Virginia) us-east-1 region.
+This workshop assumes the use of US East (N. Virginia) us-east-1 region.
 For the sake of simplicity we will use the default VPC.
 
 ### AWS IoT Core Resources
 On the AWS console navigate to the IoT Core service. Make sure you are using US East (N. Virginia) us-east-1 region.
+For a later step we will need the AWS IoT (Device data endpoint](https://docs.aws.amazon.com/iot/latest/developerguide/iot-connect-devices.html?icmpid=docs_iot_hp_settings#iot-connect-device-endpoints).
+
+On the AWS IoT Core service console, on the left pannel at the bottom click 'Settings' and copy the device data endpoint.
 
 #### AWS IoT Policy
-[IoT policies](https://docs.aws.amazon.com/iot/latest/developerguide/iot-policies.html) define the operations a device can perform in AWS IoT. IoT policies are attached to device certificates. When a device presents the certificate to AWS IoT, it is granted the permissions specified in the policy.
+In order for the device to publish and subscribe for messages requred during provisioning workflow
+AWS IoT Core will have to attach the temporary claim certificate to [AWS IoT Core policies](https://docs.aws.amazon.com/iot/latest/developerguide/iot-policies.html) which define the operations the device can perform in AWS IoT Core.
+IoT policies are attached to device certificates. When a device presents the certificate to AWS IoT Core it is granted the permissions specified in the policy.
 
 First we need to create AWS IoT policy which will be used by our device during the provisioning workflow.
 
-1. On the AWS IoT console navigate to 'Secure' and then 'Policies'.
+1. On the IoT Core service console navigate to 'Secure' and then 'Policies'.
 2. Click 'Create a policy'
 3. Set Name: 'TrustedUserProvisioningPolicy'
-4. Click 'Advanced mode' and replace the policy content with the below. You will have to replace 'account' with your account id. When done, click 'Create'
+4. Click 'Advanced mode' under the 'Add statements' section, and replace the policy content with the below. You will have to replace 'account' with your account id.
+5. When done, click on 'Create'
 
 ```
 {
@@ -58,8 +64,9 @@ First we need to create AWS IoT policy which will be used by our device during t
 }
 ```
 
-Next, we need to create second IoT Policy which the device will use once its permanent certificate will be in place. This policy will be referenced by the provisioning template so it will be attached to the permanent certificate.
-Below policy allow the device to publish and subscribe to MQTT messages on topics prefixed by the Thing name. Use the AWS IoT Thing Name as the MQTT client ID for connecting as a device over MQTT.
+Next, we need to create second IoT Policy which the device will be attached to the permanent certificate. This policy is referenced by the provisioning template and attached to the permanent certificate in the workflow process.
+Below policy allow the device to connect, publish, and subscribe to MQTT messages on topics prefixed by the Thing name.
+
 Create new IoT policy, name it 'pubsub', and set below content for the policy. You will have to replace 'account' with your account id.
 ```
 {
@@ -110,8 +117,8 @@ For the sake of simplicity we will not use Pre Provisioning Hook.
     * Click 'Next'
     * Choose 'Use an existing AWS IoT policy' and select 'TrustedUserProvisioningPolicy' created earlier
     * Click 'Create template'
-4. Click 'Enable template'
-5. Navigate to the created template and click 'Edit JSON'
+4. Click 'Enable template' at the bottom of the page
+5. Navigate to 'Fleet provisioning templates', select created template and click 'Edit JSON'
 6. Replace the content of the template with below content, and click 'Save as new version'
 ```
 {
@@ -143,26 +150,39 @@ For the sake of simplicity we will not use Pre Provisioning Hook.
 ```
 
 ### EC2 resources
+Make sure you are using US East (N. Virginia) us-east-1 region in the console.
+
+#### Create a New Cloud9 IDE Instance
+We will use Cloud9 IDE environment to emulate our trusted user API calls.
+
+From the AWS Console, navigate to Cloud9, select US East (N. Virginia) us-east-1, then create a new environment with the following environment settings:
+
+1. Name: fp_workshop
+2. Click 'Next step'
+3. Leave defaults and click 'Next step'
+4. Review environment details and click 'Create environment'
 
 #### Key pair
-1. Navigate to the AWS EC2 console. Under 'Network & Security' select 'Key Pairs', and click 'Key Pairs'.
-    * Name: <any name>
-    * File format: ppk
+Create key pair to be used by later SSH sessions.
+1. Navigate to the AWS EC2 service console. Under 'Network & Security' select 'Key Pairs', and click 'Create key Pairs'.
+    * Name: fp_workshop_kp
+    * File format: _select file format matching your SSH client_
     * Click: Create key pair
-    
+
 #### Create Ubuntu instance for emulating IoT Device
 We will Use Ubuntu EC2 with ARM architecture to emulate our IoT device.
 
 Navigate to the AWS EC2 console. Under 'Instances' select 'Instances', and click 'Launch instance'.
 
 1. Choose an Amazon Machine Image (AMI)
-    * Ubuntu Server 18.04 LTS & select 64-bit (Arm)
+    * Ubuntu Server 18.04 LTS
+    * Make sure to select select the **64-bit (Arm)** option
     * Click: 'Select'
 2. Choose an Instance Type
     * t4g.micro (Free Trial available)
     * Click: 'Next: Configure Instance Details'
 3. Configure Instance Details
-    * Leave defaults or select VPC & subnets
+    * Leave defaults
     * Click: 'Next: Add Storage'
 4. Add Storage
     * Click: 'Next: Add Tags'
@@ -174,24 +194,15 @@ Navigate to the AWS EC2 console. Under 'Instances' select 'Instances', and click
      * Click: 'Review and Launch'
 7. Review Instance Launch
      * Click: 'Launch'
-     * 'Choose an existing key pair'  Or 'Create new key pair'
+     * 'Choose an existing key pair'
+     * make sure 'fp_workshop_kp' is selected
      * acknowledge you have the key pair
      * Click: 'Launch Instances'
 
-Wait until the instance state becomes 'Running' & Note down the instance public IP.
-#### Create a New Cloud9 IDE Instance
-We will use Cloud9 IDE environment to emulate our trusted user API calls.
-
-From the AWS Console, navigate to Cloud9, select the region you will be working in for all the labs, then create a new environment with the following environment settings:
-
-* Create a new instance for environment (EC2)
-* t3.small (2 GiB RAM + 2 vCPU)
-* Amazon Linux
-* Cost-savings setting: After four hours
-* Network settings: Default VPC and public subnet
+Wait until the instance 'Status check' becomes green (passed) & Note down the instance public IP.
 
 ## Setting up the device
-SSH into the instance public IP using your private key and user 'ubuntu'.
+SSH into the Ubuntu instance public IP using your private key and user 'ubuntu'.
 
 If you are using different operating system than Ubuntu you will have to modify some of below shell commands to match your OS.
 ```
@@ -199,7 +210,7 @@ sudo apt update
 sudo apt -y upgrade
 # Install pre-requisits for the Device Client
 sudo apt install -y cmake g++ libssl-dev git
-git clone https://github.com/awslabs/aws-iot-device-client.git
+git clone https://github.com/doronbl/aws-iot-device-client.git
 cd aws-iot-device-client
 mkdir build
 cd build
@@ -263,13 +274,14 @@ chmod 644 $HOME/cert/device-client-fp.pem.crt
 chmod 600 $HOME/cert/device-client-fp.private.pem.key
 ```
 ### Initiate Fleet Provisioning from the device
-On the device run the following commands:
+On the device run below set of commands.
+
+*Note*: It is best practice to use the AWS IoT Thing Name as the MQTT client ID for connecting as a device over MQTT.
 ```bash
-export REGION_NAME=us-east-1
 export ENDPOINT=<Device data endpoint>
 cd $HOME/aws-iot-device-client/build
 ./aws-iot-device-client --enable-fleet-provisioning true \
-                        --endpoint "a3n32qeqw558pp-ats.iot.us-east-1.amazonaws.com" \
+                        --endpoint "$ENDPOINT" \
                         --cert $HOME/cert/device-client-fp.pem.crt \
                         --key $HOME/cert/device-client-fp.private.pem.key \
                         --root-ca $HOME/cert/AmazonRootCA1.pem \
@@ -280,4 +292,4 @@ cd $HOME/aws-iot-device-client/build
                         --enable-device-defender false \
                         --fleet-provisioning-template-parameters "{\"ThingName\": \"device-client-fp\"}"
 ```
-When done, you lshould be able to see permanent certificate and your Thing registered in AWS IoT Core console.
+When done, you should be able to see permanent certificate and your Thing registered in AWS IoT Core console.
