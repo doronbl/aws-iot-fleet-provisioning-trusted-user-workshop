@@ -1,6 +1,4 @@
 # AWS IoT Fleet Provisioning by trusted user
-A WORK IN PROGRESS
-
 This workshop demonstrate how to use AWS IoT Core Fleet Provisioning with trusted user to automate device provisioning workflow. 
 
 To complete this workshop you will need an active AWS account.
@@ -224,7 +222,6 @@ Using a trusted user, such as an end user or an installer with a known account, 
 For more information, see [Provisioning by trusted user](https://docs.aws.amazon.com/iot/latest/developerguide/provision-wo-cert.html#trusted-user).
 
 To keep things simple, we will not use web or mobile app, instead we will use our Cloud9 environment into which you need to authenticate and authorise in order to call the API for creating temporary claim certificate.
- See [here](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/iot/create-provisioning-claim.html) for more information about AWS CLI command we will use.
 
 Make sure the principle you are using within Cloud9 environment have the following IAM policy attached.
 This IAM policy allow the principle to call the IoT CreateProvisioningClaim API for TrustedUserProvisioningTemplate template.
@@ -240,5 +237,47 @@ You will have to replace 'account' with your account id.
     ]
 }
 ```
+### Create temporary provisioning claim
+To create temporary provisioning claim run the following AWS CLI command:
+```bash
+aws iot create-provisioning-claim --template-name TrustedUserProvisioningTemplate
+```
+See [here](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/iot/create-provisioning-claim.html) for more information about above AWS CLI command.
 
-You will have to copy the PrivateKey and the certificatePem attributes 
+**Note**: This claim is valid for only 5 minutes.
+
+Copy the result PrivateKey and the certificatePem attributes to into below files on the device:
+```bash
+# PrivateKey
+$HOME/cert/device-client-fp.pem.crt
+# certificatePem
+$HOME/cert/device-client-fp.private.pem.key
+```
+
+You will have to transform the formatting of the text within the files.
+Run below bash commands to reformat the files and set appropriate file permissions.
+```bash
+sed -i 's/\\n/\n/g' $HOME/cert/device-client-fp.pem.crt
+sed -i 's/\\n/\n/g' $HOME/cert/device-client-fp.private.pem.key
+chmod 644 $HOME/cert/device-client-fp.pem.crt
+chmod 600 $HOME/cert/device-client-fp.private.pem.key
+```
+### Initiate Fleet Provisioning from the device
+On the device run the following commands:
+```bash
+export REGION_NAME=us-east-1
+export ENDPOINT=<Device data endpoint>
+cd $HOME/aws-iot-device-client/build
+./aws-iot-device-client --enable-fleet-provisioning true \
+                        --endpoint "a3n32qeqw558pp-ats.iot.us-east-1.amazonaws.com" \
+                        --cert $HOME/cert/device-client-fp.pem.crt \
+                        --key $HOME/cert/device-client-fp.private.pem.key \
+                        --root-ca $HOME/cert/AmazonRootCA1.pem \
+                        --thing-name device-client-fp \
+                        --fleet-provisioning-template-name TrustedUserProvisioningTemplate \
+                        --enable-jobs false \
+                        --enable-tunneling false \
+                        --enable-device-defender false \
+                        --fleet-provisioning-template-parameters "{\"ThingName\": \"device-client-fp\"}"
+```
+When done, you lshould be able to see permanent certificate and your Thing registered in AWS IoT Core console.
