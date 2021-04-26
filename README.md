@@ -202,6 +202,11 @@ Navigate to the AWS EC2 console. Under 'Instances' select 'Instances', and click
 Wait until the instance 'Status check' becomes green (passed) & Note down the instance public IP.
 
 ## Setting up the device
+AWS have multiple options for device developers, these options include [IoT SDK](https://docs.aws.amazon.com/iot/latest/developerguide/iot-sdks.html)
+for multiple programming languages. In addition to the IoT SDKs you can choose to use [IoT Device Client](https://github.com/awslabs/aws-iot-device-client#introduction);
+a free, open-source, modular software written in C++ that you can compile and install on your Embedded Linux based IoT devices to access AWS IoT Core, AWS IoT Device Management, and AWS IoT Device Defender features by default.
+Using IoT Device Client we greatly simplify our development, so will use it for our example device.
+
 SSH into the Ubuntu instance public IP using your private key and user 'ubuntu'.
 
 If you are using different operating system than Ubuntu you will have to modify some of below shell commands to match your OS.
@@ -210,7 +215,7 @@ sudo apt update
 sudo apt -y upgrade
 # Install pre-requisits for the Device Client
 sudo apt install -y cmake g++ libssl-dev git
-git clone https://github.com/doronbl/aws-iot-device-client.git
+git clone https://github.com/awslabs/aws-iot-device-client.git
 cd aws-iot-device-client
 mkdir build
 cd build
