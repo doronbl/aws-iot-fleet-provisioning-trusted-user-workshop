@@ -11,7 +11,7 @@ For the sake of simplicity we will use the default VPC.
 
 ### AWS IoT Core Resources
 On the AWS console navigate to the IoT Core service. Make sure you are using US East (N. Virginia) us-east-1 region.
-For a later step we will need the AWS IoT (Device data endpoint](https://docs.aws.amazon.com/iot/latest/developerguide/iot-connect-devices.html?icmpid=docs_iot_hp_settings#iot-connect-device-endpoints).
+For a later step we will need the AWS IoT [Device data endpoint](https://docs.aws.amazon.com/iot/latest/developerguide/iot-connect-devices.html?icmpid=docs_iot_hp_settings#iot-connect-device-endpoints).
 
 On the AWS IoT Core service console, on the left pannel at the bottom click 'Settings' and copy the device data endpoint.
 
