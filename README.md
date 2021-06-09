@@ -1,9 +1,21 @@
 # AWS IoT device provisioning by trusted user
-This workshop demonstrate how to use AWS IoT Core device [provisioning by trusted user](https://docs.aws.amazon.com/iot/latest/developerguide/provision-wo-cert.html#trusted-user) to automate provisioning workflow. 
+This Bootcamp will provide an understanding of the basics to configure and run [device provisioning by trusted user](https://docs.aws.amazon.com/iot/latest/developerguide/provision-wo-cert.html#trusted-user) using AWS IoT Device Client. 
 
-To complete this workshop you will need an active AWS account.
+During this workshop you will learn how to connect devices to AWS IoT, install Device Client software and initiate provisioning workflow.
 
-This workshop will use Ubuntu AWS EC2 instance to emulate a device. If you are using different operating system you will have to modify the operating system setup steps to your OS. Most of this workshop is independant of the device type.
+The guideline was written to be used on an Ubuntu Amazon EC2 Instance. But it should be easy to replace the code to be used with your own device (ex. RaspberyPI), or other operating system. Most of this workshop is independant of the device type.
+
+To complete this workshop you will need an active AWS account, and basic understanding of [AWS IoT](https://docs.aws.amazon.com/iot/latest/developerguide/what-is-aws-iot.html).
+
+## Intro
+AWS provides several different ways to provision a device and install unique client certificates on it. AWS also offer [an interactive tool to help guide your decision](https://pythia.architecture.aws.dev/conversation/WoJ6Vp/WoJ6Vp-4pKLxC/DECISION_1597211738237). These options are described in detail in the white paper titled, [Device Manufacturing and Provisioning with X.509 Certificates in AWS IoT Core](https://d1.awsstatic.com/whitepapers/device-manufacturing-provisioning.pdf).
+
+This workshop focus on the option of 'Fleet Provisioning by Trusted User'. Fleet Provisioning by Trusted User is the recommended approach when a high degree of security is needed, when the manufacturing chain is not trusted, or it is not possible to provision devices in the manufacturing chain due to technical limitations, cost, or application specific limitations. Using this approach, the credentials are never exposed to the manufacturing supply chain. Read [here](https://docs.aws.amazon.com/iot/latest/developerguide/provision-wo-cert.html) for more details.
+
+### Basic flow
+An installer uses a mobile/web application and authenticates with AWS. Using the Trusted User APIs, the installer receives a temporary X.509 certificate and private key that is valid for five minutes. Using the mobile/web application, the credentials are delivered to the device. The device connects to AWS IoT and exchanges the temporary credentials for a unique X.509 certificate signed with the AWS CA and a private key. During this workflow, the AWS resources including Thing name, Policy, and Certificate are set up in the AWS Account.
+
+![fp_by_trasted_user_flow.png](https://github.com/doronbl/aws-iot-fleet-provisioning-trusted-user-workshop/blob/main/images/fp_by_trasted_user_flow.png?raw=true)
 
 ## Setting up cloud resources
 This workshop assumes the use of US East (N. Virginia) us-east-1 region.
@@ -298,3 +310,7 @@ cd $HOME/aws-iot-device-client/build
                         --fleet-provisioning-template-parameters "{\"ThingName\": \"device-client-fp\"}"
 ```
 When done, you should be able to see permanent certificate and your Thing registered in AWS IoT Core console.
+
+## Useful Resources
+[Device provisioning developer guide](https://docs.aws.amazon.com/iot/latest/developerguide/iot-provision.html)
+[Device Manufacturing and Provisioning with X.509 Certificates in AWS IoT Core whitepaper](https://d1.awsstatic.com/whitepapers/device-manufacturing-provisioning.pdf)
