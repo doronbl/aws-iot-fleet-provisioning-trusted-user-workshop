@@ -35,11 +35,14 @@ For a later step we will need the AWS IoT [Device data endpoint](https://docs.aw
 On the AWS IoT Core service console, on the left pannel at the bottom click 'Settings' and copy the device data endpoint.
 
 #### AWS IoT Policy
-In order for the device to publish and subscribe for messages requred during provisioning workflow
-AWS IoT Core will have to attach the temporary claim certificate to [AWS IoT Core policies](https://docs.aws.amazon.com/iot/latest/developerguide/iot-policies.html) which define the operations the device can perform in AWS IoT Core.
-IoT policies are attached to device certificates. When a device presents the certificate to AWS IoT Core it is granted the permissions specified in the policy.
+[IoT policies](https://docs.aws.amazon.com/iot/latest/developerguide/iot-policies.html) consists of operations that allow device to connect to the AWS IoT Core message broker, send and receive MQTT messages, and get or update a device's shadow.
+Policies are attached to a certificate which define the device identity. When device connectes, AWS IoT uses the certificate to find the attached policy and the authorization rules it holds.
 
-First we need to create AWS IoT policy which will be used by our device during the provisioning workflow.
+Fleet provisioning workflow requires two IoT Policies:
+1. First IoT policy is attached by AWS IoT to the temporary certificate, so the device can initiate the provisioning workflow. 
+2. Second policy is attached to the permanent certificate provisioned into the device.
+
+Lets create the first IoT policy to be attached to the temporary certificates:
 
 1. On the IoT Core service console navigate to 'Secure' and then 'Policies'.
 2. Click 'Create a policy'
@@ -83,8 +86,8 @@ First we need to create AWS IoT policy which will be used by our device during t
 }
 ```
 
-Next, we need to create second IoT Policy which the device will be attached to the permanent certificate. This policy is referenced by the provisioning template and attached to the permanent certificate in the workflow process.
-Below policy allow the device to connect, publish, and subscribe to MQTT messages on topics prefixed by the Thing name.
+Next, we need to create second IoT Policy which will be attached to the permanent certificate provisioned into the device. This policy is referenced by the provisioning template and attached to the permanent certificate during the workflow process.
+Below policy allow the device to connect, publish, and subscribe to MQTT messages on topics prefixed by the Thing name (MQTT client ID & and registered Thing name in AWS IoT Core).
 
 Create new IoT policy, name it 'pubsub', and set below content for the policy. You will have to replace 'account' with your account id.
 ```
