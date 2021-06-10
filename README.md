@@ -319,6 +319,16 @@ cd $HOME/aws-iot-device-client/build
 ```
 When done, you should be able to see permanent certificate and your Thing registered in AWS IoT Core console. Validate that your certificate is attached to the pubsub policy.
 
+## Enhancing our solution with Pre-provisioning hooks & Device configuration
+[Pre-provisioning hook](https://docs.aws.amazon.com/iot/latest/developerguide/pre-provisioning-hook.html) is a Lambda function invoked during the provisioning workflow to validate parameters passed from the device before allowing the device to be provisioned. For example, you can check if the device serial number exists in your device inventory and is scheduled for provisioning today.
+
+Device configuration is a section withing the [provisioning template](https://docs.aws.amazon.com/iot/latest/developerguide/provision-template.html) which contains arbitrary data you want to send back to your devices when provisioning.
+
+### Adding Pre-provisioning hook
+
+### Adding Device configuration
+
 ## Useful Resources
 [Device provisioning developer guide](https://docs.aws.amazon.com/iot/latest/developerguide/iot-provision.html)
+
 [Device Manufacturing and Provisioning with X.509 Certificates in AWS IoT Core whitepaper](https://d1.awsstatic.com/whitepapers/device-manufacturing-provisioning.pdf)
