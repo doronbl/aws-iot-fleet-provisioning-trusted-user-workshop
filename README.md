@@ -254,8 +254,6 @@ wget https://www.amazontrust.com/repository/AmazonRootCA1.pem
 chmod 644 ./AmazonRootCA1.pem
 ```
 ## Obtain a temporary provisioning claim certificate
-If you cannot securely install unique client certificates on your IoT device before they are delivered to the end user, but the end user or an installer can use an app to register the devices and install the unique device certificates, you want to use the provisioning by trusted user process.
-
 Using a trusted user, such as an end user or an installer with a known account, can simplify the device manufacturing process. Instead of a unique client certificate, devices have a temporary certificate that enables the device to connect to AWS IoT for only 5 minutes. During that 5-minute window, the trusted user obtains a unique client certificate with a longer life and installs it on the device. The limited life of the claim certificate minimizes the risk of a compromised certificate. 
 For more information, see [Provisioning by trusted user](https://docs.aws.amazon.com/iot/latest/developerguide/provision-wo-cert.html#trusted-user).
 
@@ -319,7 +317,7 @@ cd $HOME/aws-iot-device-client/build
                         --enable-device-defender false \
                         --fleet-provisioning-template-parameters "{\"ThingName\": \"device-client-fp\"}"
 ```
-When done, you should be able to see permanent certificate and your Thing registered in AWS IoT Core console.
+When done, you should be able to see permanent certificate and your Thing registered in AWS IoT Core console. Validate that your certificate is attached to the pubsub policy.
 
 ## Useful Resources
 [Device provisioning developer guide](https://docs.aws.amazon.com/iot/latest/developerguide/iot-provision.html)
