@@ -3,7 +3,7 @@ This Bootcamp will provide an understanding of the basics to configure and run [
 
 During this workshop you will learn how to connect devices to AWS IoT, install Device Client software and initiate provisioning workflow.
 
-The guideline was written to be used on an Ubuntu Amazon EC2 Instance. But it should be easy to replace the code to be used with your own device (ex. RaspberyPI), or other operating system. Most of this workshop is independant of the device type.
+The guideline was written to be used on an Ubuntu Amazon EC2 Instance. But it should be easy to replace the code to be used with your own device (ex. RaspberyPI), or other operating system. Most of this workshop is independant of the device type or processor architecture.
 
 To complete this workshop you will need an active AWS account, and basic understanding of [AWS IoT](https://docs.aws.amazon.com/iot/latest/developerguide/what-is-aws-iot.html).
 
@@ -13,13 +13,20 @@ AWS provides several different ways to provision a device and install unique cli
 This workshop focus on the option of 'Fleet Provisioning by Trusted User'. Fleet Provisioning by Trusted User is the recommended approach when a high degree of security is needed, when the manufacturing chain is not trusted, or it is not possible to provision devices in the manufacturing chain due to technical limitations, cost, or application specific limitations. Using this approach, the credentials are never exposed to the manufacturing supply chain. Read [here](https://docs.aws.amazon.com/iot/latest/developerguide/provision-wo-cert.html) for more details.
 
 ### Basic flow
-An installer uses a mobile/web application and authenticates with AWS. Using the Trusted User APIs, the installer receives a temporary X.509 certificate and private key that is valid for five minutes. Using the mobile/web application, the credentials are delivered to the device. The device connects to AWS IoT and exchanges the temporary credentials for a unique X.509 certificate signed with the AWS CA and a private key. During this workflow, the AWS resources including Thing name, Policy, and Certificate are set up in the AWS Account.
+Human installer uses a mobile/web application, he write and own, and authenticates with AWS. Using the trusted (authenticated) user APIs, the installer receives a temporary X.509 certificate and private key that is valid for five minutes. Using the mobile/web application, the credentials are delivered to the device. The device connects to AWS IoT and exchanges the temporary credentials for a unique X.509 certificate signed with the AWS CA and a private key. During this workflow, the AWS resources including Thing name, Policy, and Certificate are set up in the AWS Account.
 
 ![fp_by_trasted_user_flow.png](https://github.com/doronbl/aws-iot-fleet-provisioning-trusted-user-workshop/blob/main/images/fp_by_trasted_user_flow.png?raw=true)
 
 ## Setting up cloud resources
 This workshop assumes the use of US East (N. Virginia) us-east-1 region.
 For the sake of simplicity we will use the default VPC.
+We will provision the following resources:
+1. Cloud9 IDE which will act as our development platform
+2. Key pair to access our EC2 instance on the next step
+3. EC2 Ubuntu instance for emulating IoT device
+5. AWS IoT resources such as IoT Policys,Fleet Provisioning template, Thing, certificate, etc
+6. Lambda function to validate parameters passed from the device before allowing the device to be provisioned (Pre-provisioning hook)
+7. Related IAM roles
 
 ### AWS IoT Core Resources
 On the AWS console navigate to the IoT Core service. Make sure you are using US East (N. Virginia) us-east-1 region.
