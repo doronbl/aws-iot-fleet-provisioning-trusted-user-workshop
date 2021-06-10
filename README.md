@@ -325,9 +325,9 @@ When done, you should be able to see permanent certificate and your Thing regist
 Device configuration is a section withing the [provisioning template](https://docs.aws.amazon.com/iot/latest/developerguide/provision-template.html) which contains arbitrary data you want to send back to your devices when provisioning.
 
 ### Adding Pre-provisioning hook
-
+Will be added soon
 ### Adding Device configuration
-
+Will be added soon
 ## Useful Resources
 [Device provisioning developer guide](https://docs.aws.amazon.com/iot/latest/developerguide/iot-provision.html)
 
