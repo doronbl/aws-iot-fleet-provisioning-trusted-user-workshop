@@ -385,7 +385,7 @@ def lambda_handler(event, context):
     }
 ```
 
-**Notes:
+**Note**: 
 The Lambda function must return a response that indicates whether it has authorized the provisioning request and the values of any properties to override.
 If the Lambda function fails or doesn't return the "allowProvisioning" parameter in the response, the provisioning request will fail and the error will be returned in the response.
 You can use the hook to populate "parameterOverrides" response attribute with dynamic values, which will be added to the 
