@@ -325,7 +325,81 @@ When done, you should be able to see permanent certificate and your Thing regist
 Device configuration is a section withing the [provisioning template](https://docs.aws.amazon.com/iot/latest/developerguide/provision-template.html) which contains arbitrary data you want to send back to your devices when provisioning.
 
 ### Adding Pre-provisioning hook
-Will be added soon
+This example demonstrate how Lambda can be used to validate device parameters before the device is provisioned.
+For simplicity, the Lambda will use internal list of allowed serial numbers. In practice, you will probably keep this data in DynamoDB or other data store.
+
+#### Creating Lambda
+On the Lambda console click 'Create function'
+1. 'Function name': PreProvisioningHook
+2. 'Runtime': Python 3.8
+3. Click 'Create funstion'
+
+During Lambda creation default execution role was provisioned and attached to the Lambda. This role include basic Lambda permissions such as writing execution logs to CloudWatch.
+In production use-cases, you will probably create IAM role allowing the function to access the data store and any other services the function will need in order to run properly.
+
+#### Adding code
+At the lambda function console code tab, open lambda_function.py and replace the code with below content:
+```
+import json
+
+device_database = [
+    { "serial": "1234567", "customer": "cust1", "subscription": "premium" },
+    { "serial": "7654321", "customer": "cust2", "subscription": "free" }
+]
+
+# Fetch device data from database. Use serial number as key to find
+def get_device_data(serialNumber):
+    
+    result = {
+        'allowProvisioning': False,
+        'customer': None
+    }
+    
+    for device in device_database:
+        if device['serial'] == serialNumber:
+            result['allowProvisioning'] = True
+            result['customer'] = device['customer']
+    
+    return result
+
+# Function handler called by the IoT Pre-Provisioning hook
+
+def lambda_handler(event, context):
+    print('Event: ', event)
+    
+    sn = event['parameters']['serialNumber']
+    allowProvisioning = False
+    customer = None
+    
+    device_info = get_device_data(sn)
+    
+    if device_info['allowProvisioning']:
+	    allowProvisioning = True
+	    customer = device_info['customer']
+	
+    return {
+        'allowProvisioning': allowProvisioning,
+        'parameterOverrides': {
+            'Customer': customer
+        }
+    }
+```
+
+**Notes:
+The Lambda function must return a response that indicates whether it has authorized the provisioning request and the values of any properties to override.
+If the Lambda function fails or doesn't return the "allowProvisioning" parameter in the response, the provisioning request will fail and the error will be returned in the response.
+You can use the hook to populate "parameterOverrides" response attribute with dynamic values, which will be added to the 
+template parameters section. If parameter is already defined, the value from the hook will overide the template.
+This gives flexability for injecting dynamic values, or calculating values not known on the device side which should be added by the cloud application.
+You can reference these parameters in the template.
+
+#### Attaching the Lambda hook to the template
+At the AWS IoT Coer console:
+1. Onboard->Fleet provisioning templates
+2. Click the three dots ('...') of the 'TrustedUserProvisioningTemplate' template, and select 'Edit template'
+3. Under 'Pre Provisioning Hook' section, click 'Select' and choose 'PreProvisioningHook'
+4. Click 'Update template'
+
 ### Adding Device configuration
 Will be added soon
 ## Useful Resources
