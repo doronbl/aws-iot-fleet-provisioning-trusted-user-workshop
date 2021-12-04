@@ -77,7 +77,7 @@ Lets create the first IoT policy to be attached to the temporary certificates:
     },
     {
       "Effect": "Allow",
-      "Action": "iot:Connect",
+      "Action": ["iot:Connect"],
       "Resource": "*"
     }
   ]
