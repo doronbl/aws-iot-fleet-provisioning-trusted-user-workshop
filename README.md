@@ -61,8 +61,8 @@ Lets create the first IoT policy to be attached to the temporary certificates:
         "iot:Publish"
       ],
       "Resource": [
-        "arn:aws:iot:us-east-1:account:topic/$aws/certificates/create/json",
-        "arn:aws:iot:us-east-1:account:topic/$aws/provisioning-templates/TrustedUserProvisioningTemplate/provision/json"
+        "arn:aws:iot:us-east-1:account:topic/$aws/certificates/create/*",
+        "arn:aws:iot:us-east-1:account:topic/$aws/provisioning-templates/TrustedUserProvisioningTemplate/provision/*"
       ]
     },
     {
