@@ -57,6 +57,7 @@ Lets create the first IoT policy to be attached to the temporary certificates:
     {
       "Effect": "Allow",
       "Action": [
+        "iot:Receive",
         "iot:Publish"
       ],
       "Resource": [
@@ -67,20 +68,17 @@ Lets create the first IoT policy to be attached to the temporary certificates:
     {
       "Effect": "Allow",
       "Action": [
-        "iot:Receive",
         "iot:Subscribe"
       ],
       "Resource": [
-        "arn:aws:iot:us-east-1:account:topic/$aws/certificates/create/json/accepted",
-        "arn:aws:iot:us-east-1:account:topic/$aws/certificates/create/json/rejected",
-        "arn:aws:iot:us-east-1:account:topic/$aws/provisioning-templates/TrustedUserProvisioningTemplate/provision/json/accepted",
-        "arn:aws:iot:us-east-1:account:topic/$aws/provisioning-templates/TrustedUserProvisioningTemplate/provision/json/rejected"
+        "arn:aws:iot:us-east-1:account:topicfilter/$aws/certificates/create/*",
+        "arn:aws:iot:us-east-1:account:topicfilter/$aws/provisioning-templates/TrustedUserProvisioningTemplate/provision/*"
       ]
     },
     {
       "Effect": "Allow",
       "Action": "iot:Connect",
-      "Resource": "arn:aws:iot:us-east-1:account:client/${iot:Connection.Thing.ThingName}"
+      "Resource": "*"
     }
   ]
 }
