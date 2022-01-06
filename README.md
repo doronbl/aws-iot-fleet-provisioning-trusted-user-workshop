@@ -257,8 +257,8 @@ For more information, see [Provisioning by trusted user](https://docs.aws.amazon
 
 To keep things simple, we will not use web or mobile app, instead we will use our Cloud9 environment into which you need to authenticate and authorise in order to call the API for creating temporary claim certificate.
 
-Make sure the principle you are using within Cloud9 environment have the following IAM policy attached.
-This IAM policy allow the principle to call the IoT CreateProvisioningClaim API for TrustedUserProvisioningTemplate template.
+Make sure the principal you are using within Cloud9 environment have the following IAM policy attached.
+This IAM policy allow the principal to call the IoT CreateProvisioningClaim API for TrustedUserProvisioningTemplate template.
 You will have to replace 'account' with your account id.
 ```
 {
@@ -283,9 +283,9 @@ See [here](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/io
 Copy the result PrivateKey and the certificatePem attributes to into below files on the device:
 ```bash
 # PrivateKey
-$HOME/cert/device-client-fp.pem.crt
-# certificatePem
 $HOME/cert/device-client-fp.private.pem.key
+# certificatePem
+$HOME/cert/device-client-fp.pem.crt
 ```
 
 You will have to transform the formatting of the text within the files.
